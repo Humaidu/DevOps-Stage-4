@@ -1,5 +1,10 @@
 FROM openjdk:17-jdk
 WORKDIR /app
+
+COPY . .
+
+RUN ./mvnw clean package -DskipTests
+
 COPY target/users-api-0.0.1-SNAPSHOT.jar users-api.jar
 
 EXPOSE 8081
