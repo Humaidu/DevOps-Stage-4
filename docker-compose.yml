@@ -7,24 +7,24 @@ services:
     command:
       - "--api.dashboard=true"
       - "--providers.docker=true"
+      - "--api.insecure=true" 
       - "--entrypoints.web.address=:80"
       - "--entrypoints.websecure.address=:443"
       - "--certificatesresolvers.myresolver.acme.tlschallenge=true"
       - "--certificatesresolvers.myresolver.acme.email=humaiduali@gmail.com"
       - "--certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json"
-      - "--entrypoints.web.http.redirections.entrypoint.to=websecure"
-      - "--entrypoints.web.http.redirections.entrypoint.scheme=https"
+      #- "--entrypoints.web.http.redirections.entrypoint.to=websecure"
+      #- "--entrypoints.web.http.redirections.entrypoint.scheme=https"
     ports:
       - "80:80"
       - "443:443"
+      - "8085:8085"
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock"
       - "./letsencrypt:/letsencrypt"
 
   frontend:
     build: ./frontend
-    ports:
-      - "80:80"
     depends_on:
       - auth-api
       - todos-api
@@ -33,7 +33,7 @@ services:
       - .env
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.frontend.rule=Host(`humaidu.xyz`)"
+      - "traefik.http.routers.frontend.rule=Host(`humaidu.xyz`, `www.humaidu.xyz`)"
       - "traefik.http.routers.frontend.entrypoints=websecure"
       - "traefik.http.routers.frontend.tls.certresolver=myresolver"
 
@@ -85,6 +85,8 @@ services:
       - redis
     env_file:
       - .env
+    labels:
+      - "traefik.enable=false"
 
   redis:
     image: redis:alpine
