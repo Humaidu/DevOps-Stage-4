@@ -16,22 +16,20 @@ COPY . .
 # Build the application
 RUN npm run build
 
-# Use an Nginx image to serve the static files
-FROM nginx:alpine
+# Use a lightweight Node.js runtime for serving the app
+FROM node:14-alpine
 
-# Set working directory to Nginx default path
-WORKDIR /usr/share/nginx/html
+# Set the working directory inside the container
+WORKDIR /app
 
-# Remove the default Nginx static files
-RUN rm -rf ./*
+# Install a simple static file server (serve)
+RUN npm install -g serve
 
 # Copy built frontend files from the previous stage
 COPY --from=build /app/dist .
 
-# Expose the default Nginx HTTP port
-EXPOSE 80
+# Expose the application port
+EXPOSE 8080
 
-# Start Nginx when the container runs
-CMD ["nginx", "-g", "daemon off;"]
-
-
+# Start the app using "serve"
+CMD ["serve", "-s", ".", "-l", "8080"]
